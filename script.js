@@ -27,7 +27,9 @@ class Player {
 		this.height = height;
 
 		let options = {
-			restitution: 0
+			restitution: 0,
+			friction: 0.5
+
 		}
 
 		this.body = Matter.Bodies.rectangle(this.posX, this.posY + (this.width/2), this.width, 1, options);
@@ -78,7 +80,8 @@ class Platform {
 	constructor(posX,posY,width,height) {
 		let options = {
 			isStatic: true,
-			restitution: 0.1
+			restitution: 0.1,
+			friction: 0.5
 		}
 		
 		this.posX = posX;
@@ -116,8 +119,15 @@ function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 	rect(posX, posY, sizeX, sizeY); 
 }
 
-
-
+function platform_positions(){
+	//function to generate new platforms when previous platforms are off screen
+	for (let i = 0; i < currentPlatforms.length; i++) {
+		if(currentPlatforms[i].posY < VP_HEIGHT){
+			currentPlatforms[i].posY = get_random(100, 300)
+			currentPlatforms[i].posX = get_random(0,(VP_WIDTH-currentPlatforms[i].width))
+		}	
+	}
+}
 
 
 function apply_angularvelocity() {
@@ -129,6 +139,10 @@ function apply_force() {
 
 
 function get_random(min, max) {
+	//returns a random value between the specified parameters
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min) + min); 
 }
 
 
@@ -152,10 +166,21 @@ function setup() {
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
 	currentPlayer = new Player(VP_WIDTH/2,10,30,50);
-	currentPlatforms.push(new Platform(VP_WIDTH/2,VP_HEIGHT,VP_WIDTH,40));
-	currentPlatforms.push(new Platform(255,405,50,10));
-	currentPlatforms.push(new Platform(400,600,50,10));
+	currentPlatforms.push(new Platform(VP_WIDTH/2,VP_HEIGHT,VP_WIDTH,40)); //Main Floor Platform
 
+	let platformWidth = 50
+	let platformHeight = 10
+	let randomX = get_random(0+platformWidth,VP_WIDTH-platformWidth);
+	let randomY = get_random(VP_HEIGHT-200,VP_HEIGHT-100);
+	currentPlatforms.push(new Platform(randomX,randomY,platformWidth,platformHeight));
+
+	for (let i = 1; i<6; i++){
+		let platformWidth = 50
+		let platformHeight = 10
+		let randomX = get_random(0+platformWidth,VP_WIDTH-platformWidth);
+		let randomY = get_random((currentPlatforms[i].posY-200),(currentPlatforms[i].posY-100));
+		currentPlatforms.push(new Platform(randomX,randomY,platformWidth,platformHeight));
+	}
 	frameRate(60); //specifies the number of (refresh) frames displayed every second
 
 }
@@ -181,6 +206,5 @@ function draw() {
 	Matter.Engine.update(engine);
 	paint_background();
 	paint_assets();
-	
-
+	platform_positions()
 }
