@@ -9,28 +9,46 @@
 
 const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold the (vp) details (e.g., size, etc.)
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
-var viewport;
-var currentPlayer;
-var currentPlatforms = [];
+var viewport; //Defines the viewport 
+var currentPlayer; //Defines variable to store the current player object
+var currentPlatforms = []; //Defines Array to store all active platforms in the game
 
 class Player {
 	constructor(posX, posY) {
+		//Creates New Player at specific location
 		this.posX = posX;
 		this.posY = posY;
+
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, 60, 100);
+		Matter.World.add(world, this.body);
 	}
 	draw() {
-		draw_rect(60,100,this.posX,this.posY,0,255,0,CENTER);
+		let pos = this.body.position; //create an shortcut alias 
+		rectMode(CENTER); //switch centre to be centre rather than left, top
+		fill('#00ff00'); //set the fill colour
+		rect(pos.x, pos.y, 60, 100); //draw the rectangle
 	}
 	
 }
 
 class Platform {
 	constructor(posX,posY) {
+		let options = {
+			isStatic: true
+		}
+		
 		this.posX = posX;
 		this.posY = posY;
+
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, 100, 20, options);
+
+		Matter.World.add(world, this.body);
 	}
 	draw() {
-		draw_rect(100,20,this.posX,this.posY,50,50,50,CENTER);
+		let pos = this.body.position; //create an shortcut alias 
+		rectMode(CENTER); //switch centre to be centre rather than left, top
+		fill('#222222'); //set the fill colour
+		rect(pos.x, pos.y, 100, 20); //draw the rectangle
 	}
 }
 
@@ -50,7 +68,10 @@ function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 	rect(posX, posY, sizeX, sizeY); 
 }
 
+const rectConstructor = settings => 
+
 function apply_velocity() {
+	
 };
 
 
@@ -86,7 +107,7 @@ function setup() {
 	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT/1.5);
 	currentPlatforms.push(new Platform(255,255));
 
-	frameRate(10); //specifies the number of (refresh) frames displayed every second
+	frameRate(30); //specifies the number of (refresh) frames displayed every second
 
 }
 
@@ -108,6 +129,7 @@ function paint_assets() {
 
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
+	Matter.Engine.update(engine);
 	paint_background();
 	paint_assets();
 	
