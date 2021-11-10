@@ -10,11 +10,15 @@
 const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold the (vp) details (e.g., size, etc.)
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
 var viewport;
+var currentPlayer;
 
 class Player {
 	constructor(posX, posY) {
 		this.posX = posX;
 		this.posY = posY;
+	}
+	draw() {
+		draw_rect(40,60,this.posX,this.posY,0,255,0,CENTER);
 	}
 	
 }
@@ -70,8 +74,9 @@ function setup() {
 	body = Matter.Body; //the module that contains all 'matter' methods for creating and manipulating 'body' models a 'matter' body 
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
+	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT/1.5);
 
-	frameRate(1); //specifies the number of (refresh) frames displayed every second
+	frameRate(10); //specifies the number of (refresh) frames displayed every second
 
 }
 
@@ -90,4 +95,5 @@ function paint_assets() {
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
 	paint_background();
+	currentPlayer.draw();
 }
