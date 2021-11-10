@@ -11,6 +11,7 @@ const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold 
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
 var viewport;
 var currentPlayer;
+var currentPlatforms = [];
 
 class Player {
 	constructor(posX, posY) {
@@ -18,12 +19,20 @@ class Player {
 		this.posY = posY;
 	}
 	draw() {
-		draw_rect(40,60,this.posX,this.posY,0,255,0,CENTER);
+		draw_rect(60,100,this.posX,this.posY,0,255,0,CENTER);
 	}
 	
 }
 
-
+class Platform {
+	constructor(posX,posY) {
+		this.posX = posX;
+		this.posY = posY;
+	}
+	draw() {
+		draw_rect(100,20,this.posX,this.posY,50,50,50,CENTER);
+	}
+}
 
 
 function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
@@ -75,6 +84,7 @@ function setup() {
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
 	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT/1.5);
+	currentPlatforms.push(new Platform(255,255));
 
 	frameRate(10); //specifies the number of (refresh) frames displayed every second
 
@@ -89,11 +99,17 @@ function paint_background() {
 
 function paint_assets() {
 	//a defined function to 'paint' assets to the canvas
+	currentPlayer.draw();
+	for(let platform = 0; platform < currentPlatforms.length; platform++) {
+		currentPlatforms[platform].draw();
+	}
 }
 
 
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
 	paint_background();
-	currentPlayer.draw();
+	paint_assets();
+	
+
 }
