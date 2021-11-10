@@ -20,9 +20,9 @@
 
 
 
-const vp_width = 920, vp_height = 690; //defined global const variables to hold the (vp) details (e.g., size, etc.)
+const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold the (vp) details (e.g., size, etc.)
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
-
+var viewport;
 
 function apply_velocity() {
 };
@@ -76,4 +76,5 @@ function paint_assets() {
 
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
+	paint_background();
 }
