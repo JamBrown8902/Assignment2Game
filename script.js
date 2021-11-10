@@ -38,10 +38,10 @@ class Player {
 		let pos = this.body.position; //create an shortcut alias 
 		this.checkCollisions();
 		if(keyIsDown(LEFT_ARROW)) {
-			pos.x = pos.x - 1;
+			pos.x = pos.x - 0.5;
 		}
 		if(keyIsDown(RIGHT_ARROW)) {
-			pos.x = pos.x + 1;
+			pos.x = pos.x + 0.5;
 		}
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#00ff00'); //set the fill colour
@@ -143,6 +143,8 @@ function setup() {
 	viewport = createCanvas(VP_WIDTH, VP_HEIGHT); //set the viewport (canvas) size
 	viewport.parent("viewport_container"); //attach the created canvas to the target div
 	
+	
+
 	//enable the matter engine
 	engine = Matter.Engine.create(); //the 'engine' is a controller that manages updating the 'simulation' of the world
 	world = engine.world; //the instance of the world (contains all bodies, constraints, etc) to be simulated by the engine
@@ -150,10 +152,11 @@ function setup() {
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
 	currentPlayer = new Player(VP_WIDTH/2,10,30,50);
+	currentPlatforms.push(new Platform(VP_WIDTH/2,VP_HEIGHT,VP_WIDTH,40));
 	currentPlatforms.push(new Platform(255,405,50,10));
 	currentPlatforms.push(new Platform(400,600,50,10));
 
-	frameRate(30); //specifies the number of (refresh) frames displayed every second
+	frameRate(60); //specifies the number of (refresh) frames displayed every second
 
 }
 
