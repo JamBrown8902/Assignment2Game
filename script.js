@@ -13,6 +13,11 @@ var viewport; //Defines the viewport
 var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
 
+function apply_velocity(body, xVel, yVel) {
+	Matter.Body.setVelocity( body, {x: xVel, y: yVel});
+};
+
+
 class Player {
 	constructor(posX, posY, width, height) {
 		//Creates New Player at specific location
@@ -22,14 +27,16 @@ class Player {
 		this.height = height;
 
 		let options = {
-			restitution: 0.5
+			restitution: 0
 		}
 
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height);
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY + (this.width/2), this.width, 1, options);
 		Matter.World.add(world, this.body);
 	}
 	draw() {
+		
 		let pos = this.body.position; //create an shortcut alias 
+		this.checkCollisions();
 		if(keyIsDown(LEFT_ARROW)) {
 			pos.x = pos.x - 1;
 		}
@@ -38,7 +45,31 @@ class Player {
 		}
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#00ff00'); //set the fill colour
-		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
+		rect(pos.x, pos.y - (this.width/2), this.width, this.height); //draw the rectangle
+	}
+	checkCollisions() {
+
+		if(this.body.velocity.y < 0) {
+			this.body.collisionFilter = {
+				'group': -1,
+				'category': 2,
+				'mask': 0,
+			  };
+		} else {
+			body.collisionFilter = {
+				'group': 0,
+				'category': 1,
+				'mask': 0,
+			  };
+			for(let platform = 0; platform < currentPlatforms.length; platform++) {
+				if(Matter.Bounds.overlaps(this.body.bounds, currentPlatforms[platform].body.bounds)) {
+					apply_velocity(this.body,0,-15);
+				}			
+			}
+		}
+
+		
+		
 	}
 	
 }
@@ -46,7 +77,8 @@ class Player {
 class Platform {
 	constructor(posX,posY,width,height) {
 		let options = {
-			isStatic: true
+			isStatic: true,
+			restitution: 0.1
 		}
 		
 		this.posX = posX;
@@ -63,7 +95,9 @@ class Platform {
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#222222'); //set the fill colour
 		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
+		
 	}
+	
 }
 
 
@@ -82,11 +116,8 @@ function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 	rect(posX, posY, sizeX, sizeY); 
 }
 
-const rectConstructor = settings => 
 
-function apply_velocity() {
 
-};
 
 
 function apply_angularvelocity() {
@@ -119,7 +150,7 @@ function setup() {
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
 	currentPlayer = new Player(VP_WIDTH/2,10,30,50);
-	currentPlatforms.push(new Platform(255,255,50,10));
+	currentPlatforms.push(new Platform(255,405,50,10));
 	currentPlatforms.push(new Platform(400,600,50,10));
 
 	frameRate(30); //specifies the number of (refresh) frames displayed every second
