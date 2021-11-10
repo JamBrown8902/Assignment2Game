@@ -12,6 +12,8 @@ var engine, world, body; //defined global variables to hold the game's viewport 
 var viewport; //Defines the viewport 
 var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
+var globalHeight;
+var testDummy;
 
 function apply_velocity(body, xVel, yVel) {
 	Matter.Body.setVelocity( body, {x: xVel, y: yVel});
@@ -25,29 +27,39 @@ class Player {
 		this.posY = posY;
 		this.width = width;
 		this.height = height;
+		this.deceleration = 0.275;
 
 		let options = {
 			restitution: 0,
-			friction: 0.5
+			friction: 0.8
 
 		}
 
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY + (this.width/2), this.width, 1, options);
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY + (this.width/2), this.width, 0.1, options);
 		Matter.World.add(world, this.body);
 	}
 	draw() {
-		
 		let pos = this.body.position; //create an shortcut alias 
 		this.checkCollisions();
+		this.updateHeight();
 		if(keyIsDown(LEFT_ARROW)) {
-			pos.x = pos.x - 0.5;
+			pos.x = pos.x - 0.4;
 		}
 		if(keyIsDown(RIGHT_ARROW)) {
-			pos.x = pos.x + 0.5;
+			pos.x = pos.x + 0.4;
 		}
+
+		//if(globalHeight > 0) {
+		//	apply_velocity(this.body,this.body.velocity.x,this.body.velocity.y);
+		//}
+		
+
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#00ff00'); //set the fill colour
 		rect(pos.x, pos.y - (this.width/2), this.width, this.height); //draw the rectangle
+
+		this.posX = pos.x;
+		this.posY = pos.y;
 	}
 	checkCollisions() {
 
@@ -65,13 +77,27 @@ class Player {
 			  };
 			for(let platform = 0; platform < currentPlatforms.length; platform++) {
 				if(Matter.Bounds.overlaps(this.body.bounds, currentPlatforms[platform].body.bounds)) {
-					apply_velocity(this.body,0,-15);
+					apply_velocity(this.body,0,-12);
 				}			
 			}
 		}
 
 		
 		
+	}
+	updateHeight() {
+		
+		if(this.body.position.y < (VP_HEIGHT / 2) && globalHeight <= 0 && this.body.velocity.y < 0) {
+			globalHeight = this.body.velocity.y * -1;
+
+		} else if(globalHeight > 0) {
+			globalHeight = globalHeight - 0.26;
+			apply_velocity(this.body,this.body.velocity.x,0);
+
+		}else {
+			globalHeight = 0;
+
+		}
 	}
 	
 }
@@ -80,7 +106,7 @@ class Platform {
 	constructor(posX,posY,width,height) {
 		let options = {
 			isStatic: true,
-			restitution: 0.1,
+			restitution: 0,
 			friction: 0.5
 		}
 		
@@ -94,10 +120,16 @@ class Platform {
 		Matter.World.add(world, this.body);
 	}
 	draw() {
-		let pos = this.body.position; //create an shortcut alias 
+		let pos = this.body.position; //create an shortcut alias
+		pos.y = pos.y + globalHeight;
+		let newPos = Matter.Vector.create(0,globalHeight);
+		Matter.Bounds.translate(this.body.bounds, newPos);
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#222222'); //set the fill colour
 		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
+
+		this.posX = pos.x;
+		this.posY = pos.y;
 		
 	}
 	
@@ -122,13 +154,24 @@ function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 function platform_positions(){
 	//function to generate new platforms when previous platforms are off screen
 	for (let i = 0; i < currentPlatforms.length; i++) {
-		if(currentPlatforms[i].posY < VP_HEIGHT){
-			currentPlatforms[i].posY = get_random(100, 300)
-			currentPlatforms[i].posX = get_random(0,(VP_WIDTH-currentPlatforms[i].width))
+		if(currentPlatforms[i].posY > VP_HEIGHT){
+			currentPlatforms.splice(i,1);
+			let lastItem = currentPlatforms[currentPlatforms.length - 1];
+			currentPlatforms.push(generatePlatform(lastItem.posY,lastItem.posX));
 		}	
 	}
 }
 
+function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platformHeight = 10) {
+	if(previousWidth > VP_WIDTH - 326) {
+		previousWidth = VP_WIDTH - 326
+	} else if(previousWidth < 326) {
+		previousWidth = 326
+	}
+	let randomX = get_random(previousWidth+300,previousWidth-300);
+	let randomY = get_random(previousHeight-200,previousHeight-100);
+	return (new Platform(randomX,randomY,platformWidth,platformHeight));
+}
 
 function apply_angularvelocity() {
 };
@@ -156,7 +199,7 @@ function setup() {
 	//a 'p5' defined function runs automatically once the preload function is complete
 	viewport = createCanvas(VP_WIDTH, VP_HEIGHT); //set the viewport (canvas) size
 	viewport.parent("viewport_container"); //attach the created canvas to the target div
-	
+	globalHeight = 0;
 	
 
 	//enable the matter engine
@@ -165,21 +208,13 @@ function setup() {
 	body = Matter.Body; //the module that contains all 'matter' methods for creating and manipulating 'body' models a 'matter' body 
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
-	currentPlayer = new Player(VP_WIDTH/2,10,30,50);
+	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT-100,30,50);
 	currentPlatforms.push(new Platform(VP_WIDTH/2,VP_HEIGHT,VP_WIDTH,40)); //Main Floor Platform
 
-	let platformWidth = 50
-	let platformHeight = 10
-	let randomX = get_random(0+platformWidth,VP_WIDTH-platformWidth);
-	let randomY = get_random(VP_HEIGHT-200,VP_HEIGHT-100);
-	currentPlatforms.push(new Platform(randomX,randomY,platformWidth,platformHeight));
+	currentPlatforms.push(generatePlatform(VP_HEIGHT,VP_WIDTH/2));
 
 	for (let i = 1; i<6; i++){
-		let platformWidth = 50
-		let platformHeight = 10
-		let randomX = get_random(0+platformWidth,VP_WIDTH-platformWidth);
-		let randomY = get_random((currentPlatforms[i].posY-200),(currentPlatforms[i].posY-100));
-		currentPlatforms.push(new Platform(randomX,randomY,platformWidth,platformHeight));
+		currentPlatforms.push(generatePlatform(currentPlatforms[i].posY,currentPlatforms[i].posX));
 	}
 	frameRate(60); //specifies the number of (refresh) frames displayed every second
 
