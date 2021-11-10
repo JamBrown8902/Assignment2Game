@@ -14,33 +14,47 @@ var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
 
 class Player {
-	constructor(posX, posY) {
+	constructor(posX, posY, width, height) {
 		//Creates New Player at specific location
 		this.posX = posX;
 		this.posY = posY;
+		this.width = width;
+		this.height = height;
 
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, 60, 100);
+		let options = {
+			restitution: 0.5
+		}
+
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height);
 		Matter.World.add(world, this.body);
 	}
 	draw() {
 		let pos = this.body.position; //create an shortcut alias 
+		if(keyIsDown(LEFT_ARROW)) {
+			pos.x = pos.x - 1;
+		}
+		if(keyIsDown(RIGHT_ARROW)) {
+			pos.x = pos.x + 1;
+		}
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#00ff00'); //set the fill colour
-		rect(pos.x, pos.y, 60, 100); //draw the rectangle
+		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
 	}
 	
 }
 
 class Platform {
-	constructor(posX,posY) {
+	constructor(posX,posY,width,height) {
 		let options = {
 			isStatic: true
 		}
 		
 		this.posX = posX;
 		this.posY = posY;
+		this.width = width;
+		this.height = height;
 
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, 100, 20, options);
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
 
 		Matter.World.add(world, this.body);
 	}
@@ -48,7 +62,7 @@ class Platform {
 		let pos = this.body.position; //create an shortcut alias 
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#222222'); //set the fill colour
-		rect(pos.x, pos.y, 100, 20); //draw the rectangle
+		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
 	}
 }
 
@@ -71,7 +85,7 @@ function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 const rectConstructor = settings => 
 
 function apply_velocity() {
-	
+
 };
 
 
@@ -104,8 +118,9 @@ function setup() {
 	body = Matter.Body; //the module that contains all 'matter' methods for creating and manipulating 'body' models a 'matter' body 
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
 
-	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT/1.5);
-	currentPlatforms.push(new Platform(255,255));
+	currentPlayer = new Player(VP_WIDTH/2,10,30,50);
+	currentPlatforms.push(new Platform(255,255,50,10));
+	currentPlatforms.push(new Platform(400,600,50,10));
 
 	frameRate(30); //specifies the number of (refresh) frames displayed every second
 
