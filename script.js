@@ -11,6 +11,32 @@ const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold 
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
 var viewport;
 
+class Player {
+	constructor(posX, posY) {
+		this.posX = posX;
+		this.posY = posY;
+	}
+	
+}
+
+
+
+
+function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
+	//Function will draw a rectangle on the screen with the inputted colour and sized at a specific location
+	//Determines rectMode (whether shape is drawn from corner or center etc.)
+	rectMode(drawMode); 
+	//Gives Rectangle an outline
+	stroke(0, 0, 0); 
+	strokeWeight(1); 
+	
+	//Colours Rectangle with specific rgb colour
+	fill(r, g, b); 
+
+	//Draws shape with specific size at set location
+	rect(posX, posY, sizeX, sizeY); 
+}
+
 function apply_velocity() {
 };
 
