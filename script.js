@@ -3,10 +3,6 @@
 //Saved "Tasks" to text file
 
 
-
-
-
-
 const VP_WIDTH = 920, VP_HEIGHT = 690; //defined global const variables to hold the (vp) details (e.g., size, etc.)
 var engine, world, body; //defined global variables to hold the game's viewport and the 'matter' engine components
 var viewport; //Defines the viewport 
@@ -42,12 +38,15 @@ class Player {
 		let pos = this.body.position; //create an shortcut alias 
 		this.checkCollisions();
 		this.updateHeight();
+	
 		if(keyIsDown(LEFT_ARROW)) {
 			pos.x = pos.x - 0.4;
 		}
 		if(keyIsDown(RIGHT_ARROW)) {
 			pos.x = pos.x + 0.4;
 		}
+
+
 
 		//if(globalHeight > 0) {
 		//	apply_velocity(this.body,this.body.velocity.x,this.body.velocity.y);
@@ -56,10 +55,23 @@ class Player {
 
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#00ff00'); //set the fill colour
+		
+		// this.posX = pos.x;
+		// this.posY = pos.y;
+		
+		if(pos.x < -10){
+			Matter.Body.setPosition(this.body, {x:VP_WIDTH, y:pos.y})
+		}
+		if(pos.x > VP_WIDTH+10){
+			Matter.Body.setPosition(this.body, {x:0, y:pos.y})
+		}
+
 		rect(pos.x, pos.y - (this.width/2), this.width, this.height); //draw the rectangle
 
-		this.posX = pos.x;
-		this.posY = pos.y;
+		
+		
+
+		
 	}
 	checkCollisions() {
 
@@ -180,6 +192,70 @@ class FallingPlatform {
 	}
 }
 
+
+class SlidingPlatform {
+	constructor(posX,posY,width,height) {
+		let options = {
+			isStatic: true,
+			restitution: 0,
+			friction: 0.5
+		}
+		console.log("SLIDING PLATFORM GENERATED")
+		this.posX = posX;
+		this.posY = posY;
+		this.width = width;
+		this.height = height;
+		this.type = "sliding";
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
+		this.movementRange = get_random(30,100);
+		this.originalX = posX
+		this.maxMovepoint = posX + this.movementRange;
+		this.moveLeft = false;
+
+		Matter.World.add(world, this.body);
+	}
+	draw() {
+		let pos = this.body.position; //create an shortcut alias
+		rectMode(CENTER); //switch centre to be centre rather than left, top
+		fill('#0000ff'); //set the fill colour
+		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
+		this.posX = pos.x;
+		this.posY = pos.y;
+		
+		
+		
+	}
+}
+
+class BlackHole {
+	constructor(posX,posY,diameter) {
+		let options = {
+			isStatic: true,
+			restitution: 0,
+			friction: 0.5
+		}
+		console.log("BLACK HOLE GENERATED")
+		this.posX = posX;
+		this.posY = posY;
+		this.diameter = diameter;
+		this.body = Matter.Bodies.circle(this.posX, this.posY, this.diameter, options);
+
+		Matter.World.add(world, this.body);
+	}
+	draw() {
+		let pos = this.body.position; //create an shortcut alias
+		ellipseMode(CENTER); //switch centre to be centre rather than left, top
+		fill('#000000'); //set the fill colour
+		circle(pos.x, pos.y, this.diameter); //draw the circle
+		this.posX = pos.x;
+		this.posY = pos.y;
+		
+		
+		
+	}
+}
+
+
 function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 	//Function will draw a rectangle on the screen with the inputted colour and sized at a specific location
 	//Determines rectMode (whether shape is drawn from corner or center etc.)
@@ -206,6 +282,14 @@ function platform_positions(){
 	}
 }
 
+// function generateBlackHole (){
+// 	let posX = get_random(0,VP_WIDTH)
+// 	let posY = -50
+// 	let diameter = get_random(10,30)
+// 	return(new BlackHole(posX,posY,diameter));
+// }
+
+
 function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platformHeight = 10) {
 	if(previousWidth > VP_WIDTH - 326) {
 		previousWidth = VP_WIDTH - 326
@@ -214,10 +298,17 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 	}
 	let randomX = get_random(previousWidth+300,previousWidth-300);
 	let randomY = get_random(previousHeight-200,previousHeight-100);
-	let platformRandom = get_random(0,5);
+	let blackHoleRandomX = get_random(0,VP_WIDTH)
+	let blackHoleRandomY = get_random(0,VP_HEIGHT)
+	let blackHoleRandomDiam= get_random(10,30)
+	let platformRandom = get_random(0,10);
 	if(platformRandom == 3 && score > 100) {
 		return (new FallingPlatform(randomX,randomY,platformWidth,platformHeight));
-	} else {
+
+	}else if(platformRandom == 4 && score > 150){
+		//return (new SlidingPlatform(randomX,randomY,platformWidth,platformHeight));
+
+	}else {
 		return (new Platform(randomX,randomY,platformWidth,platformHeight));
 	}
 	
@@ -294,7 +385,7 @@ function draw() {
 	if(globalHeight > 0) {
 		score = score + 1;
 	}
-	console.log(score);
+	//console.log(score);
 	Matter.Engine.update(engine);
 	paint_background();
 	paint_assets();
