@@ -39,10 +39,10 @@ class Player {
 		this.checkCollisions();
 		this.updateHeight();
 	
-		if(keyIsDown(LEFT_ARROW)) {
+		if(keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
 			pos.x = pos.x - 0.4;
 		}
-		if(keyIsDown(RIGHT_ARROW)) {
+		if(keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
 			pos.x = pos.x + 0.4;
 		}
 
@@ -224,6 +224,7 @@ class SlidingPlatform {
 		
 		
 		
+		
 	}
 }
 
@@ -305,7 +306,7 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 	if(platformRandom == 3 && score > 100) {
 		return (new FallingPlatform(randomX,randomY,platformWidth,platformHeight));
 
-	}else if(platformRandom == 4 && score > 150){
+	//}else if(platformRandom == 4 && score > 150){
 		//return (new SlidingPlatform(randomX,randomY,platformWidth,platformHeight));
 
 	}else {
