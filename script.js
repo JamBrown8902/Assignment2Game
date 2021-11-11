@@ -1,5 +1,6 @@
 "use strict"; //incorporating this 'expression' tells the browser to enable 'strict mode' - this mode helps ensure you write better code, for example, it prevents the use of undeclared variables.
 
+
 //Saved "Tasks" to text file
 
 
@@ -14,263 +15,6 @@ var score;
 function apply_velocity(body, xVel, yVel) {
 	Matter.Body.setVelocity( body, {x: xVel, y: yVel});
 };
-
-
-class Player {
-	constructor(posX, posY, width, height) {
-		//Creates New Player at specific location
-		this.posX = posX;
-		this.posY = posY;
-		this.width = width;
-		this.height = height;
-		this.deceleration = 0.275;
-
-		let options = {
-			restitution: 0,
-			friction: 0.8
-
-		}
-
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY + (this.width/2), this.width, 0.1, options);
-		Matter.World.add(world, this.body);
-	}
-	draw() {
-		let pos = this.body.position; //create an shortcut alias 
-		this.checkCollisions();
-		this.updateHeight();
-	
-		if(keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
-			pos.x = pos.x - 0.4;
-		}
-		if(keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
-			pos.x = pos.x + 0.4;
-		}
-
-
-
-		//if(globalHeight > 0) {
-		//	apply_velocity(this.body,this.body.velocity.x,this.body.velocity.y);
-		//}
-		
-
-		rectMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#00ff00'); //set the fill colour
-		
-		// this.posX = pos.x;
-		// this.posY = pos.y;
-		
-		if(pos.x < -10){
-			Matter.Body.setPosition(this.body, {x:VP_WIDTH, y:pos.y})
-		}
-		if(pos.x > VP_WIDTH+10){
-			Matter.Body.setPosition(this.body, {x:0, y:pos.y})
-		}
-
-		rect(pos.x, pos.y - (this.width/2), this.width, this.height); //draw the rectangle
-
-		
-		
-
-		
-	}
-	checkCollisions() {
-
-		if(this.body.velocity.y < 0) {
-			this.body.collisionFilter = {
-				'group': -1,
-				'category': 2,
-				'mask': 0,
-			  };
-		} else {
-			body.collisionFilter = {
-				'group': 0,
-				'category': 1,
-				'mask': 0,
-			  };
-			for(let platform = 0; platform < currentPlatforms.length; platform++) {
-				if(Matter.Bounds.overlaps(this.body.bounds, currentPlatforms[platform].body.bounds)) {
-					if(currentPlatforms[platform].type == "falling") {
-						currentPlatforms[platform].isBouncedOn();
-					}
-					apply_velocity(this.body,0,-12);
-				}			
-			}
-		}
-
-		
-		
-	}
-	updateHeight() {
-		
-		if(this.body.position.y < (VP_HEIGHT / 2) && globalHeight <= 0 && this.body.velocity.y < 0) {
-			globalHeight = this.body.velocity.y * -1;
-
-		} else if(globalHeight > 0) {
-			globalHeight = globalHeight - 0.26;
-			apply_velocity(this.body,this.body.velocity.x,0);
-
-		}else {
-			globalHeight = 0;
-
-		}
-	}
-	
-}
-
-class Platform {
-	constructor(posX,posY,width,height) {
-		let options = {
-			isStatic: true,
-			restitution: 0,
-			friction: 0.5
-		}
-		
-		this.posX = posX;
-		this.posY = posY;
-		this.width = width;
-		this.height = height;
-		this.type = "normal";
-
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
-
-		Matter.World.add(world, this.body);
-	}
-	draw() {
-		let pos = this.body.position; //create an shortcut alias
-		pos.y = pos.y + globalHeight;
-		let newPos = Matter.Vector.create(0,globalHeight);
-		Matter.Bounds.translate(this.body.bounds, newPos);
-		rectMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#222222'); //set the fill colour
-		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
-
-		this.posX = pos.x;
-		this.posY = pos.y;
-		
-	}
-	
-}
-
-class FallingPlatform {
-	constructor(posX,posY,width,height) {
-		let options = {
-			isStatic: true,
-			restitution: 0,
-			friction: 0.5
-		}
-		
-		this.posX = posX;
-		this.posY = posY;
-		this.width = width;
-		this.height = height;
-		this.type = "falling";
-		this.broken = false;
-
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
-
-		Matter.World.add(world, this.body);
-	}
-	draw() {
-		let pos = this.body.position; //create an shortcut alias
-		if(this.broken == true) {
-			pos.y = pos.y + 5;
-		}
-		pos.y = pos.y + globalHeight;
-		let newPos = Matter.Vector.create(0,globalHeight);
-		Matter.Bounds.translate(this.body.bounds, newPos);
-		rectMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#ff0000'); //set the fill colour
-		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
-
-		this.posX = pos.x;
-		this.posY = pos.y;
-
-		
-	}
-	isBouncedOn() {
-		this.broken = true;	
-	}
-}
-
-
-class SlidingPlatform {
-	constructor(posX,posY,width,height) {
-		let options = {
-			isStatic: true,
-			restitution: 0,
-			friction: 0.5
-		}
-		console.log("SLIDING PLATFORM GENERATED")
-		this.posX = posX;
-		this.posY = posY;
-		this.width = width;
-		this.height = height;
-		this.type = "sliding";
-		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
-		this.movementRange = get_random(30,100);
-		this.originalX = posX
-		this.maxMovepoint = posX + this.movementRange;
-		this.moveLeft = false;
-
-		Matter.World.add(world, this.body);
-	}
-	draw() {
-		let pos = this.body.position; //create an shortcut alias
-		rectMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#0000ff'); //set the fill colour
-		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
-		this.posX = pos.x;
-		this.posY = pos.y;
-		
-		
-		
-		
-	}
-}
-
-class BlackHole {
-	constructor(posX,posY,diameter) {
-		let options = {
-			isStatic: true,
-			restitution: 0,
-			friction: 0.5
-		}
-		console.log("BLACK HOLE GENERATED")
-		this.posX = posX;
-		this.posY = posY;
-		this.diameter = diameter;
-		this.body = Matter.Bodies.circle(this.posX, this.posY, this.diameter, options);
-
-		Matter.World.add(world, this.body);
-	}
-	draw() {
-		let pos = this.body.position; //create an shortcut alias
-		ellipseMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#000000'); //set the fill colour
-		circle(pos.x, pos.y, this.diameter); //draw the circle
-		this.posX = pos.x;
-		this.posY = pos.y;
-		
-		
-		
-	}
-}
-
-
-function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
-	//Function will draw a rectangle on the screen with the inputted colour and sized at a specific location
-	//Determines rectMode (whether shape is drawn from corner or center etc.)
-	rectMode(drawMode); 
-	//Gives Rectangle an outline
-	stroke(0, 0, 0); 
-	strokeWeight(1); 
-	
-	//Colours Rectangle with specific rgb colour
-	fill(r, g, b); 
-
-	//Draws shape with specific size at set location
-	rect(posX, posY, sizeX, sizeY); 
-}
 
 function platform_positions(){
 	//function to generate new platforms when previous platforms are off screen
@@ -303,16 +47,22 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 	let blackHoleRandomY = get_random(0,VP_HEIGHT)
 	let blackHoleRandomDiam= get_random(10,30)
 	let platformRandom = get_random(0,10);
-	if(platformRandom == 3 && score > 100) {
-		return (new FallingPlatform(randomX,randomY,platformWidth,platformHeight));
-
-	//}else if(platformRandom == 4 && score > 150){
-		//return (new SlidingPlatform(randomX,randomY,platformWidth,platformHeight));
-
-	}else {
-		return (new Platform(randomX,randomY,platformWidth,platformHeight));
+	switch(platformRandom) {
+		case 1: case 2:
+			if(score > 100) {
+				return (new SlidingPlatform(randomX,randomY,platformWidth,platformHeight));
+			} else {
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			}
+		case 3: case 4:
+			if(score > 200) {
+				return (new FallingPlatform(randomX,randomY,platformWidth,platformHeight));
+			} else {
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			}
+		default:
+			return (new Platform(randomX,randomY,platformWidth,platformHeight));
 	}
-	
 }
 
 function apply_angularvelocity() {
