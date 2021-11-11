@@ -9,6 +9,7 @@ var engine, world, body; //defined global variables to hold the game's viewport 
 var viewport; //Defines the viewport 
 var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
+var currentPowerUps = [];
 var globalHeight;
 var score;
 
@@ -60,6 +61,9 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 			} else {
 				return (new Platform(randomX,randomY,platformWidth,platformHeight));
 			}
+		case 5:
+			currentPowerUps.push(new Boost(randomX,randomY-7));
+			return (new Platform(randomX,randomY,platformWidth,platformHeight));
 		default:
 			return (new Platform(randomX,randomY,platformWidth,platformHeight));
 	}
@@ -121,13 +125,17 @@ function paint_background() {
 	background('#a0a1a2'); //use a 'hex' (denoted with '#') RGB colour (red: a0, green: a1, blue: a2 - appears as a grey colour) to set the background
 }
 
+function drawAllInList(objList) {
+	for(let x = 0; x < objList.length; x++) {
+		objList[x].draw();
+	}
+}
 
 function paint_assets() {
 	//a defined function to 'paint' assets to the canvas
 	currentPlayer.draw();
-	for(let platform = 0; platform < currentPlatforms.length; platform++) {
-		currentPlatforms[platform].draw();
-	}
+	drawAllInList(currentPlatforms);
+	drawAllInList(currentPowerUps);
 }
 
 

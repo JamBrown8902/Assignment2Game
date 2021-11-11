@@ -39,6 +39,8 @@ class FallingPlatform {
 		
 	}
 	isBouncedOn() {
-		this.broken = true;	
+        if(currentPlayer.body.velocity.y > 1) {
+            this.broken = true;	
+        }		
 	}
 }
