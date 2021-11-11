@@ -387,7 +387,10 @@ function draw() {
 	}
 	//console.log(score);
 	Matter.Engine.update(engine);
+	
 	paint_background();
 	paint_assets();
-	platform_positions()
+	platform_positions();
+	fill(255,255,255);
+    text("Score " + int(score), 20, 20);
 }
