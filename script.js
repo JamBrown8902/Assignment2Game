@@ -13,7 +13,7 @@ var viewport; //Defines the viewport
 var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
 var globalHeight;
-var testDummy;
+var score;
 
 function apply_velocity(body, xVel, yVel) {
 	Matter.Body.setVelocity( body, {x: xVel, y: yVel});
@@ -77,6 +77,9 @@ class Player {
 			  };
 			for(let platform = 0; platform < currentPlatforms.length; platform++) {
 				if(Matter.Bounds.overlaps(this.body.bounds, currentPlatforms[platform].body.bounds)) {
+					if(currentPlatforms[platform].type == "falling") {
+						currentPlatforms[platform].isBouncedOn();
+					}
 					apply_velocity(this.body,0,-12);
 				}			
 			}
@@ -114,6 +117,7 @@ class Platform {
 		this.posY = posY;
 		this.width = width;
 		this.height = height;
+		this.type = "normal";
 
 		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
 
@@ -135,6 +139,46 @@ class Platform {
 	
 }
 
+class FallingPlatform {
+	constructor(posX,posY,width,height) {
+		let options = {
+			isStatic: true,
+			restitution: 0,
+			friction: 0.5
+		}
+		
+		this.posX = posX;
+		this.posY = posY;
+		this.width = width;
+		this.height = height;
+		this.type = "falling";
+		this.broken = false;
+
+		this.body = Matter.Bodies.rectangle(this.posX, this.posY, this.width, this.height, options);
+
+		Matter.World.add(world, this.body);
+	}
+	draw() {
+		let pos = this.body.position; //create an shortcut alias
+		if(this.broken == true) {
+			pos.y = pos.y + 5;
+		}
+		pos.y = pos.y + globalHeight;
+		let newPos = Matter.Vector.create(0,globalHeight);
+		Matter.Bounds.translate(this.body.bounds, newPos);
+		rectMode(CENTER); //switch centre to be centre rather than left, top
+		fill('#ff0000'); //set the fill colour
+		rect(pos.x, pos.y, this.width, this.height); //draw the rectangle
+
+		this.posX = pos.x;
+		this.posY = pos.y;
+
+		
+	}
+	isBouncedOn() {
+		this.broken = true;	
+	}
+}
 
 function draw_rect(sizeX,sizeY,posX,posY,r,g,b,drawMode) {
 	//Function will draw a rectangle on the screen with the inputted colour and sized at a specific location
@@ -170,7 +214,13 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 	}
 	let randomX = get_random(previousWidth+300,previousWidth-300);
 	let randomY = get_random(previousHeight-200,previousHeight-100);
-	return (new Platform(randomX,randomY,platformWidth,platformHeight));
+	let platformRandom = get_random(0,5);
+	if(platformRandom == 3 && score > 100) {
+		return (new FallingPlatform(randomX,randomY,platformWidth,platformHeight));
+	} else {
+		return (new Platform(randomX,randomY,platformWidth,platformHeight));
+	}
+	
 }
 
 function apply_angularvelocity() {
@@ -200,13 +250,16 @@ function setup() {
 	viewport = createCanvas(VP_WIDTH, VP_HEIGHT); //set the viewport (canvas) size
 	viewport.parent("viewport_container"); //attach the created canvas to the target div
 	globalHeight = 0;
-	
+	score = 0;
 
 	//enable the matter engine
 	engine = Matter.Engine.create(); //the 'engine' is a controller that manages updating the 'simulation' of the world
 	world = engine.world; //the instance of the world (contains all bodies, constraints, etc) to be simulated by the engine
 	body = Matter.Body; //the module that contains all 'matter' methods for creating and manipulating 'body' models a 'matter' body 
 	//is a 'rigid' body that can be simulated by the Matter.Engine; generally defined as rectangles, circles and other polygons)
+
+	engine.positionIterations = 10;
+	engine.velocityIterations = 10;
 
 	currentPlayer = new Player(VP_WIDTH/2,VP_HEIGHT-100,30,50);
 	currentPlatforms.push(new Platform(VP_WIDTH/2,VP_HEIGHT,VP_WIDTH,40)); //Main Floor Platform
@@ -238,6 +291,10 @@ function paint_assets() {
 
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
+	if(globalHeight > 0) {
+		score = score + 1;
+	}
+	console.log(score);
 	Matter.Engine.update(engine);
 	paint_background();
 	paint_assets();
