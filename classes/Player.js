@@ -5,7 +5,8 @@ class Player {
 		this.posY = posY;
 		this.width = width;
 		this.height = height;
-		this.deceleration = 0.275;
+		this.lives = 3;
+		this.invunFrames = 60;
 
 		let options = {
 			restitution: 0,
@@ -20,6 +21,7 @@ class Player {
 		let pos = this.body.position; //create an shortcut alias 
 		this.checkCollisions();
 		this.updateHeight();
+		this.checkIfHit();
 	
 		if(keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
 			pos.x = pos.x - 0.4;
@@ -36,7 +38,21 @@ class Player {
 		
 
 		rectMode(CENTER); //switch centre to be centre rather than left, top
-		fill('#00ff00'); //set the fill colour
+		
+		
+		switch(this.lives) {
+			case 3:
+				fill('#00ff00'); //set the fill colour
+				break;
+			case 2:
+				fill('#ffff00');
+				break;
+			case 1:
+				fill('#ff0000'); //set the fill colour
+				break;
+			case 0:
+				console.log("GAME OVER");
+		}
 		
 		// this.posX = pos.x;
 		// this.posY = pos.y;
@@ -84,7 +100,7 @@ class Player {
 	}
 	updateHeight() {
 		
-		if(this.body.position.y < (VP_HEIGHT / 2) && globalHeight <= 0 && this.body.velocity.y < 0) {
+		if(this.body.position.y < (VP_HEIGHT / 2) && globalHeight <= 0 && this.body.velocity.y < -0.5) {
 			globalHeight = this.body.velocity.y * -1;
 
 		} else if(globalHeight > 0) {
@@ -95,6 +111,29 @@ class Player {
 			globalHeight = 0;
 
 		}
+	}
+	checkIfHit() {
+		for(let enemy = 0; enemy < currentEnemies.length; enemy++) {
+			if(Matter.Bounds.overlaps(this.body.bounds, currentEnemies[enemy].body.bounds) && this.invunFrames == 0) {
+				this.invunFrames = 60;
+				if(currentEnemies[enemy] instanceof BlackHole) {
+					this.lives = 0;
+				} else {
+					this.lives = this.lives - 1;
+				}
+				currentEnemies.splice(enemy,1);
+				
+				
+				
+				console.log("HIT");
+			}
+		}
+		if(this.invunFrames > 0) {
+			this.invunFrames = this.invunFrames - 1;
+		} else {
+			this.invunFrames = 0;
+		}
+		
 	}
 	
 }

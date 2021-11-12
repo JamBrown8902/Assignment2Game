@@ -5,7 +5,6 @@ class SlidingPlatform {
 			restitution: 0,
 			friction: 0.5
 		}
-		console.log("SLIDING PLATFORM GENERATED")
 		this.posX = posX;
 		this.posY = posY;
 		this.width = width;
@@ -33,8 +32,14 @@ class SlidingPlatform {
 				this.moveLeft = true;
 			}
 		}
+		let newPos;
 		pos.y = pos.y + globalHeight;
-		let newPos = Matter.Vector.create(0,globalHeight);
+		if(this.moveLeft == true) {
+			newPos = Matter.Vector.create(this.movementSpeed,globalHeight);
+		} else {
+			newPos = Matter.Vector.create(-this.movementSpeed,globalHeight);
+		}
+		
 		Matter.Bounds.translate(this.body.bounds, newPos);
 		rectMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#0000ff'); //set the fill colour

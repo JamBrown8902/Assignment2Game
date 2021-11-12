@@ -10,6 +10,7 @@ var viewport; //Defines the viewport
 var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
 var currentPowerUps = [];
+var currentEnemies = [];
 var globalHeight;
 var score;
 
@@ -20,7 +21,7 @@ function apply_velocity(body, xVel, yVel) {
 function platform_positions(){
 	//function to generate new platforms when previous platforms are off screen
 	for (let i = 0; i < currentPlatforms.length; i++) {
-		if(currentPlatforms[i].posY > VP_HEIGHT){
+		if(currentPlatforms[i].posY > VP_HEIGHT + 100){
 			currentPlatforms.splice(i,1);
 			let lastItem = currentPlatforms[currentPlatforms.length - 1];
 			currentPlatforms.push(generatePlatform(lastItem.posY,lastItem.posX));
@@ -43,15 +44,16 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 		previousWidth = 326
 	}
 	let randomX = get_random(previousWidth+300,previousWidth-300);
-	let randomY = get_random(previousHeight-200,previousHeight-100);
-	let blackHoleRandomX = get_random(0,VP_WIDTH)
-	let blackHoleRandomY = get_random(0,VP_HEIGHT)
-	let blackHoleRandomDiam= get_random(10,30)
+	let randomY = get_random(previousHeight-140,previousHeight-100);
 	let platformRandom = get_random(0,10);
 	switch(platformRandom) {
 		case 1: case 2:
 			if(score > 100) {
-				return (new SlidingPlatform(randomX,randomY,platformWidth,platformHeight));
+				if(randomX > VP_WIDTH / 2) {
+					return (new SlidingPlatform(randomX - 50,randomY,platformWidth,platformHeight));
+				} else {
+					return (new SlidingPlatform(randomX + 50,randomY,platformWidth,platformHeight));
+				}
 			} else {
 				return (new Platform(randomX,randomY,platformWidth,platformHeight));
 			}
@@ -62,8 +64,30 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 				return (new Platform(randomX,randomY,platformWidth,platformHeight));
 			}
 		case 5:
-			currentPowerUps.push(new Boost(randomX,randomY-7));
-			return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			let newPlatform = new Platform(randomX,randomY,platformWidth,platformHeight)
+			currentPowerUps.push(new Boost(randomX,randomY-7,newPlatform));
+			return (newPlatform);
+		case 6:
+			if(randomX < (VP_WIDTH/2) - 50 || random > (VP_WIDTH/2) + 50) {
+				currentPlatforms.push(new Platform(VP_WIDTH - randomX,randomY + 10,platformWidth,platformHeight))
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			} else {
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			}
+		case 7:
+			if((randomX < (VP_WIDTH/2) - 50 || randomX > (VP_WIDTH/2) + 50) && score > 300) {
+				currentEnemies.push(new TurretEnemy(VP_WIDTH - randomX,randomY + 10))
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			} else {
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			}
+		case 8:
+			if((randomX < (VP_WIDTH/2) - 50 || randomX > (VP_WIDTH/2) + 50) && score > 300) {
+				currentEnemies.push(new BlackHole(VP_WIDTH - randomX,randomY + 10))
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			} else {
+				return (new Platform(randomX,randomY,platformWidth,platformHeight));
+			}
 		default:
 			return (new Platform(randomX,randomY,platformWidth,platformHeight));
 	}
@@ -128,6 +152,11 @@ function paint_background() {
 function drawAllInList(objList) {
 	for(let x = 0; x < objList.length; x++) {
 		objList[x].draw();
+		if(objList != currentPlatforms) {
+			if(objList[x].posY > VP_HEIGHT + 50) {
+				objList.splice(x,1);
+			}
+		}
 	}
 }
 
@@ -136,6 +165,7 @@ function paint_assets() {
 	currentPlayer.draw();
 	drawAllInList(currentPlatforms);
 	drawAllInList(currentPowerUps);
+	drawAllInList(currentEnemies);
 }
 
 
@@ -151,5 +181,7 @@ function draw() {
 	paint_assets();
 	platform_positions();
 	fill(255,255,255);
-    text("Score " + int(score), 20, 20);
+	textAlign(CENTER);
+	textSize(50);
+    text("Score: " + int(score), VP_WIDTH/2, 40,);
 }

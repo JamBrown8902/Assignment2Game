@@ -1,9 +1,10 @@
 class Boost {
-    constructor(posX,posY) {
+    constructor(posX,posY,platform) {
         let options = {
 			isStatic: true,
 		}
 		
+		this.platform = platform;
 		this.posX = posX;
 		this.posY = posY;
 
@@ -13,7 +14,8 @@ class Boost {
     }
     draw() {
         let pos = this.body.position; //create an shortcut alias
-		pos.y = pos.y + globalHeight;
+		pos.y = this.platform.body.position.y - 7;
+		//pos.y = pos.y + globalHeight;
 		let newPos = Matter.Vector.create(0,globalHeight);
 		Matter.Bounds.translate(this.body.bounds, newPos);
 		rectMode(CENTER); //switch centre to be centre rather than left, top
