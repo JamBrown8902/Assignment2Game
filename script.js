@@ -197,6 +197,11 @@ function paint_assets() {
 	drawAllInList(currentDoubleJumps);
 }
 
+function keyPressed(){
+	if (keyCode === 82) {
+		setup();
+	}
+}
 
 function draw() {
 	if ((!gameContinue) && keyIsDown(32)){
