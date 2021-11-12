@@ -29,7 +29,7 @@ class Player {
 		if(keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
 			pos.x = pos.x + 0.4;
 		}
-		if(keyIsDown(32) && this.doublejumps == 1) {
+		if((keyIsDown(32) || keyIsDown(UP_ARROW) || keyIsDown(87)) && this.doublejumps == 1) {
 			apply_velocity(this.body,0,-12);
 			this.doublejumps = 0
 		}
