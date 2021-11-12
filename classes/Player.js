@@ -7,7 +7,7 @@ class Player {
 		this.height = height;
 		this.lives = 3;
 		this.invunFrames = 60;
-
+		this.doublejumps = 0
 		let options = {
 			restitution: 0,
 			friction: 0.8
@@ -29,7 +29,10 @@ class Player {
 		if(keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
 			pos.x = pos.x + 0.4;
 		}
-
+		if(keyIsDown(32) && this.doublejumps == 1) {
+			apply_velocity(this.body,0,-12);
+			this.doublejumps = 0
+		}
 
 
 		//if(globalHeight > 0) {
@@ -51,7 +54,8 @@ class Player {
 				fill('#ff0000'); //set the fill colour
 				break;
 			case 0:
-				console.log("GAME OVER");
+				pos.x = -100
+				endGame();
 		}
 		
 		// this.posX = pos.x;
@@ -63,11 +67,18 @@ class Player {
 		if(pos.x > VP_WIDTH+10){
 			Matter.Body.setPosition(this.body, {x:0, y:pos.y})
 		}
+		if(pos.y > VP_HEIGHT+100){
+			endGame();
+		}
 
 		rect(pos.x, pos.y - (this.width/2), this.width, this.height); //draw the rectangle
 
-		
-		
+		if (this.doublejumps == 1){
+			ellipseMode(CENTER); //switch centre to be centre rather than left, top
+			fill('#E3C000'); //set the fill colour
+			ellipse(pos.x, pos.y-15, 10); //draw the circle
+		}
+	
 
 		
 	}
@@ -127,6 +138,15 @@ class Player {
 				
 				console.log("HIT");
 			}
+		}
+		for(let jumpcoins = 0; jumpcoins < currentDoubleJumps.length; jumpcoins++) {
+			if(Matter.Bounds.overlaps(this.body.bounds, currentDoubleJumps[jumpcoins].body.bounds)) {
+				if (this.doublejumps == 0){
+					this.doublejumps += 1 
+				}
+
+				currentDoubleJumps.splice(jumpcoins,1);
+			}			
 		}
 		if(this.invunFrames > 0) {
 			this.invunFrames = this.invunFrames - 1;

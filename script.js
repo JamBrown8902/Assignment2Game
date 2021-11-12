@@ -11,8 +11,10 @@ var currentPlayer; //Defines variable to store the current player object
 var currentPlatforms = []; //Defines Array to store all active platforms in the game
 var currentPowerUps = [];
 var currentEnemies = [];
+var currentDoubleJumps = [];
 var globalHeight;
 var score;
+var gameContinue = true
 
 function apply_velocity(body, xVel, yVel) {
 	Matter.Body.setVelocity( body, {x: xVel, y: yVel});
@@ -88,6 +90,15 @@ function generatePlatform(previousHeight,previousWidth,platformWidth = 50,platfo
 			} else {
 				return (new Platform(randomX,randomY,platformWidth,platformHeight));
 			}
+		
+		case 9:
+		if((randomX < (VP_WIDTH/2) - 50 || randomX > (VP_WIDTH/2) + 50) && score > 50) {
+			currentDoubleJumps.push(new DoubleJump(VP_WIDTH - randomX,randomY + 10))
+			return (new Platform(randomX,randomY,platformWidth,platformHeight));
+		} else {
+			return (new Platform(randomX,randomY,platformWidth,platformHeight));
+		}
+
 		default:
 			return (new Platform(randomX,randomY,platformWidth,platformHeight));
 	}
@@ -114,8 +125,25 @@ function preload() {
 	//the 'setup' function is called (automatically)
 }
 
+function endGame(){
+	globalHeight = VP_HEIGHT+100
+	background('#a0a1a2')
+	fill(255,255,255)
+			textStyle(BOLD);
+			textSize(120);
+			textAlign(CENTER, CENTER);
+			text("YOU LOSE", VP_WIDTH/2,VP_HEIGHT/2)
+			textStyle(NORMAL);
+			textSize(20);
+			text("Press [SPACE] to restart", VP_WIDTH/2,VP_HEIGHT/2+80)
+			gameContinue = false;		
+}
 
 function setup() {
+	currentPlatforms = []; 
+	currentPowerUps = [];
+	currentEnemies = [];
+	currentDoubleJumps = [];
 	//a 'p5' defined function runs automatically once the preload function is complete
 	viewport = createCanvas(VP_WIDTH, VP_HEIGHT); //set the viewport (canvas) size
 	viewport.parent("viewport_container"); //attach the created canvas to the target div
@@ -166,22 +194,33 @@ function paint_assets() {
 	drawAllInList(currentPlatforms);
 	drawAllInList(currentPowerUps);
 	drawAllInList(currentEnemies);
+	drawAllInList(currentDoubleJumps);
 }
 
 
 function draw() {
-	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
-	if(globalHeight > 0) {
-		score = score + 1;
+	if ((!gameContinue) && keyIsDown(32)){
+		setup();
+		gameContinue = true
 	}
-	//console.log(score);
-	Matter.Engine.update(engine);
-	
-	paint_background();
-	paint_assets();
-	platform_positions();
-	fill(255,255,255);
-	textAlign(CENTER);
-	textSize(50);
-    text("Score: " + int(score), VP_WIDTH/2, 40,);
+	if (gameContinue){
+		//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
+		if(globalHeight > 0) {
+			score = score + 1;
+		}
+		//console.log(score);
+		Matter.Engine.update(engine);
+		
+		paint_background();
+		paint_assets();
+		platform_positions();
+		fill(255,255,255);
+		textAlign(CENTER);
+		textSize(50);
+		text("Score: " + int(score), VP_WIDTH/2, 40,);
+	}
 }
+
+
+
+//SET GLOBAL HEIGHT VARIABLE TO CLEAR SCREEN MAKE ALL PLATFORMS FALL

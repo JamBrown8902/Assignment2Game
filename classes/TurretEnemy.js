@@ -31,6 +31,7 @@ class TurretEnemy {
 		Matter.Bounds.translate(this.body.bounds, newPos);
 		ellipseMode(CENTER); //switch centre to be centre rather than left, top
 		fill('#FFC0CB'); //set the fill colour
+		
 		ellipse(pos.x, pos.y, 60); //draw the rectangle
 
 		this.posX = pos.x;
