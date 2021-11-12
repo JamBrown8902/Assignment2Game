@@ -198,7 +198,7 @@ function paint_assets() {
 }
 
 function keyPressed(){
-	if (keyCode === 82) {
+	if (keyCode === 82 && gameContinue) {
 		setup();
 	}
 }
