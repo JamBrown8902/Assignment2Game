@@ -22,7 +22,7 @@ class TurretEnemy {
 		bulletVelocity = Matter.Vector.add(bulletVelocity,{x: 0, y: -30});
 		bulletVelocity = Matter.Vector.normalise(bulletVelocity);
 		bulletVelocity = Matter.Vector.mult(bulletVelocity,-3);
-        currentEnemies.push(new bullet(this.body.position.x,this.body.position.y,bulletVelocity));
+        currentEnemies.push(new Bullet(this.body.position.x,this.body.position.y,bulletVelocity));
     }
     draw() {
         let pos = this.body.position; //create an shortcut alias
