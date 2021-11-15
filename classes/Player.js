@@ -54,18 +54,17 @@ class Player {
 				fill('#ff0000'); //set the fill colour
 				break;
 			case 0:
-				pos.x = -100
+				pos.y = 99999;
 				endGame();
 		}
 		
-		// this.posX = pos.x;
-		// this.posY = pos.y;
-		
 		if(pos.x < -10){
 			Matter.Body.setPosition(this.body, {x:VP_WIDTH, y:pos.y})
+			//Matter.Bounds.translate(this.body.bounds, {x:-10 , y:0});
 		}
 		if(pos.x > VP_WIDTH+10){
 			Matter.Body.setPosition(this.body, {x:0, y:pos.y})
+			//Matter.Bounds.translate(this.body.bounds, {x:10 , y:0});
 		}
 		if(pos.y > VP_HEIGHT+100){
 			endGame();
@@ -139,13 +138,14 @@ class Player {
 				console.log("HIT");
 			}
 		}
-		for(let jumpcoins = 0; jumpcoins < currentDoubleJumps.length; jumpcoins++) {
-			if(Matter.Bounds.overlaps(this.body.bounds, currentDoubleJumps[jumpcoins].body.bounds)) {
+		for(let powerUp = 0; powerUp < currentPowerUps.length; powerUp++) {
+			if(Matter.Bounds.overlaps(this.body.bounds, currentPowerUps[powerUp].body.bounds) && currentPowerUps[powerUp] instanceof DoubleJump) {
+
 				if (this.doublejumps == 0){
 					this.doublejumps += 1 
 				}
 
-				currentDoubleJumps.splice(jumpcoins,1);
+				currentPowerUps.splice(powerUp,1);
 			}			
 		}
 		if(this.invunFrames > 0) {

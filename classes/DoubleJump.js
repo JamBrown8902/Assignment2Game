@@ -26,8 +26,5 @@ class DoubleJump {
 		// }
 		this.posX = pos.x;
 		this.posY = pos.y;
-		
-		
-		
 	}
 }
