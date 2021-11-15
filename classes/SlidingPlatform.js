@@ -4,7 +4,7 @@ class SlidingPlatform {
 	constructor(posX,posY,width,height) {
 		//Created using positional parameters (posX, posY) and size parameters (width, height)
 
-		//Defines options to be used when creating Matter body
+		//Defines options to be used when creating Matter body (not affected by gravity)
 		let options = {
 			isStatic: true,
 			restitution: 0,
