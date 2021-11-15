@@ -218,6 +218,11 @@ function paint_assets() {
 	drawAllInList(currentEnemies); //Draws the current enemies
 }
 
+function keyPressed(){
+	if (keyCode === 82 && gameContinue) {
+		setup();
+	}
+}
 
 function draw() {
 	//a 'p5' defined function that runs automatically and continously (up to your system's hardware/os limit) and based on any specified frame rate
