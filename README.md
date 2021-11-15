@@ -18,22 +18,22 @@ This functionality was implemented by both Flynn and James. To generate the plat
 
 ### Create special platforms and powerups - Flynn & James (COMPLETED)
 
-**Falling Platforms - James**
+**Falling Platforms - James**: 
 This was created by detecting when the user has bounced on the platform, then the platform's velocity is changed to fall off the screen.
 
-**Moving Platforms - Flynn**
+**Moving Platforms - Flynn**: 
 This was done by changing the platform's x position between two random points to get the platform to move from left to right
 
-**Bounce Platforms - James**
+**Bounce Platforms - James**: 
 This was done by detecting when the user has bounced on the platform, and when they have, the user's velocity is increased past the standard velocity amount.
 
-**Double Jump - Flynn**
+**Double Jump - Flynn**: 
 This was done by randomly creating objects that disappear when the user touches them. This give the illusion that the user has collected the item. Once the user has collected the item, a variable is changed within the Player class to say that the user has collected a double jump powerup. A symbol is displayed within the player to show the user that they have a double jump available and when they click 'W', up arrow or the spacebar, the user's velocity is changed as if the user has just bounced on a platform.
 
-**Black Hole - Flynn & James**
+**Black Hole - Flynn & James**: 
 This is done similarly to the double jump feature, where it is generated in a random position amongst the platforms, however, if the user touches a black hole, they die instantly.
 
-**Shooting enemies - James**
+**Shooting enemies - James**: 
 This is done by...                   
 
 ### Moving the user when they move off the screen - Flynn (COMPLETED)
