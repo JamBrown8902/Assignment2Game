@@ -1,4 +1,3 @@
-
 //Defines BlackHole Class to be used in script.js
 //A black hole is an object that instantly ends the game if the player touches it
 class BlackHole {
