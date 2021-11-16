@@ -49,7 +49,7 @@ class SlidingPlatform {
 
 		pos.y = pos.y + globalHeight; //Updates height to imitate scrolling
 
-		if(this.moveLeft == true) { //Checks what direction platform is moving to create correct vector
+		if(this.moveLeft == false) { //Checks what direction platform is moving to create correct vector
 			newPos = Matter.Vector.create(this.movementSpeed,globalHeight); //Updates newPos Vector
 		} else {
 			newPos = Matter.Vector.create(-this.movementSpeed,globalHeight); //Updates newPos Vector
